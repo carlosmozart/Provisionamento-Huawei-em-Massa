@@ -16,14 +16,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const resultados = document.querySelector('#resultados');
         resultados.innerHTML = '';
 
-        // Exibir o JSON para depuração
-        console.log('JSON Recebido:', json);
-
         // Tentar fazer o parse do JSON
         let parsedData;
         try {
             parsedData = JSON.parse(json);
-            console.log('Dados JSON processados:', parsedData); // Verificação do JSON parse
+
         } catch (error) {
             alert('Erro ao processar o JSON. Certifique-se de que o formato está correto.');
             console.error('Erro ao processar JSON:', error);
@@ -35,8 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const nome = item.name;
             const serial = item["serial-number"];
             const lineProfile = item["line-profile"];
-
-            console.log(`Processando ONU: ${nome}, serial: ${serial}, line-profile: ${lineProfile}`);
 
             // Criar lista de comandos com base no profile de linha
             let comandos = [];
@@ -53,10 +48,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     `service-port vlan 111 gpon ${placa}/${ramo} ont gemport 126 multi-service user-vlan 111 tag-transform translate`,
                     `service-port vlan ${vlan} gpon ${placa}/${ramo} ont gemport 126 multi-service user-vlan ${vlan} tag-transform translate`
                 ];
-            } else if (lineProfile && (lineProfile.toUpperCase().includes('ROUTER') || 
-                                      lineProfile.toUpperCase().includes('HUAWEI') || 
-                                      lineProfile.toUpperCase().includes('TEMP') || 
-                                      lineProfile.toUpperCase().includes('TEMP-ROUTER'))) {
+            } else if (lineProfile && (lineProfile.toUpperCase().includes('ROUTER') ||
+                lineProfile.toUpperCase().includes('HUAWEI') ||
+                lineProfile.toUpperCase().includes('TEMP') ||
+                lineProfile.toUpperCase().includes('TEMP-ROUTER'))) {
                 comandos = [
                     `conf`,
                     `interface gpon ${placa}`,
@@ -79,28 +74,43 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-  /*  limparCampos() {
-        const campos = ['placa', 'ramo', 'vlan', 'json'];
-        campos.forEach(id => {
-            this.formulario.querySelector(`#${id}`).value = '';
-        });
-    }*/
+function limparCampos() {
+    const campos = ['placa', 'ramo', 'vlan', 'json'];
+    campos.forEach(id => {
+        this.formulario.querySelector(`#${id}`).value = '';
+    });
+}
 
-  /*  copiarParaAreaDeTransferencia(){
-        const listaTexto = Array.from(this.resultados.querySelectorAll("li")).map(item => item.textContent).join("\n");
-        const textarea = document.createElement("textarea");
-        textarea.value = listaTexto;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-        alert("Lista copiada para a área de transferência!");
-    }*/
+// Função para copiar os dados
+function copiarParaAreaDeTransferencia() {
+    // Seleciona todos os itens da lista de resultados
+    const listaTexto = Array.from(document.querySelectorAll("#resultados li"))
+        .map(item => item.textContent)
+        .join("\n");
 
+    // Verifica se há conteúdo para copiar
+    if (listaTexto.trim() === '') {
+        alert("Nenhum dado disponível para copiar.");
+        return;
+    }
 
-/*window.addEventListener('load', () => {
-    const minhaInstancia = new GetValores();
-});*/
+    // Cria um elemento textarea temporário para copiar o conteúdo
+    const textarea = document.createElement("textarea");
+    textarea.value = listaTexto;
+    document.body.appendChild(textarea);
+
+    // Seleciona e copia o conteúdo do textarea
+    textarea.select();
+    document.execCommand("copy");
+
+    // Remove o textarea temporário
+    document.body.removeChild(textarea);
+
+    alert("Lista copiada para a área de transferência!");
+}
+
+// Adiciona o evento de clique ao botão "Copiar os Dados"
+document.getElementById('btn-copiar').addEventListener('click', copiarParaAreaDeTransferencia);
 
 // Alterna o modo escuro
 document.getElementById('toggleDarkMode').addEventListener('click', function () {
